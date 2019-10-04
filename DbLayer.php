@@ -48,7 +48,7 @@ class DbLayer
     public function update($par, $val, $userId, $table='user')
     {
         $dbh = $this->connect();
-        $sql = "UPDATE {$table} SET {$par} = {$val} where userId = {$userId};";
+        $sql = "UPDATE {$table} SET {$par} = '{$val}' where userId = '{$userId}';";
         $stmt = $dbh->query($sql);
         $dbh = null;
     }
@@ -56,7 +56,7 @@ class DbLayer
     public function insertNewUserId($userId)
     {
         $dbh = $this->connect();
-        $sql = "INSERT INTO user VALUES (NULL, '{$userId}', NULL, NULL, NULL, NULL);";
+        $sql = "INSERT INTO user VALUES (NULL, '{$userId}', NULL,NULL, NULL, NULL, NULL);";
         $stmt = $dbh->query($sql);
         $dbh = null;
 

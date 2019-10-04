@@ -40,9 +40,9 @@ class UserInteraction
     private function isUserExist()
     {
         try{
-
             $userInfo =  $this->db->select($this->userId);
-
+            if (!$userInfo)
+                throw new \Exception('Пустой селект');
         } catch (\Exception $e){
 
             $this->db->insertNewUserId($this->userId);
@@ -77,7 +77,7 @@ class UserInteraction
                 $this->askQuestion('edForm');
                 break;
             case $userInfo['inst']:
-                $this->askQuestion('fac');
+                $this->askQuestion('inst');
                 break;
             case $userInfo['fac']:
                 $this->askQuestion('fac');
@@ -96,7 +96,7 @@ class UserInteraction
 
     }
 
-    private function makeButton($data, $text = ' ')
+    private function makeButton($data, $text = ' ', $columnName)
     {
         $buttons = '';
 
@@ -105,7 +105,7 @@ class UserInteraction
 
             $buttons = $buttons . '        {
             "title": "' . $data['data'][$i]['name'] . '",
-            "payload": "[' .  $data['data'][$i]['name'] . ' : ' . $data['data'][$i]['id'] . ']",
+            "payload": "{\"' .  $columnName . '\" : ' . $data['data'][$i]['id'] . '}",
             "hide": true
         },';
 
@@ -123,9 +123,9 @@ class UserInteraction
     "end_session": false
   },
   "session": {
-    "session_id": "2eac4854-fce721f3-b845abba-20d60",
-    "message_id": 4,
-    "user_id": "AC9WC3DF6FCE052E45A4566A48E6B7193774B84814CE49A922E163B8B29881DC"
+    "session_id": "'. $this->allData['session']['session_id'] .'",
+    "message_id": '.  $this->allData['session']['message_id'] .',
+    "user_id": "'. $this->userId .'"
   },
   "version": "1.0"
 }';
@@ -141,32 +141,32 @@ class UserInteraction
             case 'edForm':
 
                 $apiData = json_decode(file_get_contents('https://bot-srv.mgsu.ru/api/get/grade'), true);
-                $this->makeButton($apiData,  'Выберите форму обучения: ');
+                $this->makeButton($apiData,  'Выберите форму обучения: ', 'edForm');
 
 
                 break;
             case 'inst':
 
                 $apiData = json_decode(file_get_contents('https://bot-srv.mgsu.ru/api/get/institute?edForm=' . $this->userDbInfo['edForm']), true);
-                $this->makeButton($apiData,  'Выберите институт: ');
+                $this->makeButton($apiData,  'Выберите институт: ', 'inst');
 
                 break;
             case 'fac':
 
-                $apiData = json_decode(file_get_contents('http://bot-srv.mgsu.ru/api/get/faculty?instituteId=' . $this->userDbInfo['fac']), true);
-                $this->makeButton($apiData,  'Выберите факультут: ');
+                $apiData = json_decode(file_get_contents('https://bot-srv.mgsu.ru/api/get/faculty?instituteId=' . $this->userDbInfo['fac']), true);
+                $this->makeButton($apiData,  'Выберите факультут: ', 'fac');
 
                 break;
             case 'curs':
 
                 $apiData = json_decode(file_get_contents('http://bot-srv.mgsu.ru/api/get/year?facultyId=' . $this->userDbInfo['curs']), true);
-                $this->makeButton($apiData,  'Выберите курс: ');
+                $this->makeButton($apiData,  'Выберите курс: ','curs');
 
                 break;
             case 'groupId':
 
                 $apiData = json_decode(file_get_contents('http://bot-srv.mgsu.ru/api/get/party?yearId=' . $this->userDbInfo['curs']), true);
-                $this->makeButton($apiData,  'Выберите вашу группу: ');
+                $this->makeButton($apiData,  'Выберите вашу группу: ', 'groupId');
 
                 break;
 

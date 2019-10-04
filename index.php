@@ -29,17 +29,18 @@ try{
         /**
          * Простейший лог, чтобы проверять запросы.
          */
-        file_put_contents('alisalog.txt', date('Y-m-d H:i:s') . PHP_EOL . $dataRow . PHP_EOL, FILE_APPEND);
+//        file_put_contents('alisalog.txt', date('Y-m-d H:i:s') . PHP_EOL . $dataRow . PHP_EOL, FILE_APPEND);
 
         /**
          * Преобразуем запрос пользователя в массив
          */
+        //echo $dataRow;
         $data = json_decode($dataRow, true);
 
         /**
          * Проверяем наличие всех необходимых полей
          */
-        if (!isset($data['request'], $data['request']['command'], $data['session'], $data['session']['session_id'], $data['session']['message_id'], $data['session']['user_id'])) {
+        if (!isset($data['request'], $data['session'], $data['session']['session_id'], $data['session']['message_id'], $data['session']['user_id'])) {
             /**
              * Нет всех необходимых полей. Не понятно, что вернуть, поэтому возвращаем ничего.
              */
@@ -48,15 +49,15 @@ try{
             /**
              * Получаем что конкретно спросил пользователь
              */
-            $text = $data['request']['command'];
+
 
             $userInter = new UserInteraction($data);
             $userInter->start();
+            $userInter = null;
 
             /**
              * Приводим на всякий случай запрос пользователя к нижнему регистру
              */
-            $textToCheck = strtolower($text);
 
            // $response = makeButton(file_get_contents('https://bot-srv.mgsu.ru/api/get/grade'));
 
