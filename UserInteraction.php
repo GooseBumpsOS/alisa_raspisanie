@@ -147,19 +147,19 @@ class UserInteraction
                 break;
             case 'inst':
 
-                $apiData = json_decode(file_get_contents('https://bot-srv.mgsu.ru/api/get/institute?edForm=' . $this->userDbInfo['edForm']), true);
+                $apiData = json_decode(file_get_contents('https://bot-srv.mgsu.ru/api/get/institute?gradeId=' . $this->userDbInfo['edForm']), true);
                 $this->makeButton($apiData,  'Выберите институт: ', 'inst');
 
                 break;
             case 'fac':
 
-                $apiData = json_decode(file_get_contents('https://bot-srv.mgsu.ru/api/get/faculty?instituteId=' . $this->userDbInfo['fac']), true);
+                $apiData = json_decode(file_get_contents('https://bot-srv.mgsu.ru/api/get/faculty?instituteId=' . $this->userDbInfo['inst']), true);
                 $this->makeButton($apiData,  'Выберите факультут: ', 'fac');
 
                 break;
             case 'curs':
 
-                $apiData = json_decode(file_get_contents('http://bot-srv.mgsu.ru/api/get/year?facultyId=' . $this->userDbInfo['curs']), true);
+                $apiData = json_decode(file_get_contents('http://bot-srv.mgsu.ru/api/get/year?facultyId=' . $this->userDbInfo['fac']), true);
                 $this->makeButton($apiData,  'Выберите курс: ','curs');
 
                 break;
