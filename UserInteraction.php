@@ -24,7 +24,7 @@ class UserInteraction
 
     public function start(){
 
-        if (isset($this->allData['request']['payload']))
+        if (isset($this->allData['request']['payload'])) //добавить свой обработчик payload, тк этот сугубо для регистрации
         {
 
             $payload = json_decode($this->allData['request']['payload'], true);
@@ -54,7 +54,7 @@ class UserInteraction
 
         if (count(array_filter($userInfo)) == count($userInfo)) { //если все не null
 
-            echo 'showButton';//showButton();
+            echo 'showButton';//showButton(); //здесь функция если пользователь зареган
 
         } else {
 
@@ -70,9 +70,6 @@ class UserInteraction
 
         switch (null) {
 
-
-//            case $userInfo['userId']:
-//                $this->askQuestion('userId'); //TODO сделать функцию создания userId
             case $userInfo['edForm']:
                 $this->askQuestion('edForm');
                 break;
