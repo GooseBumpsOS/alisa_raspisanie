@@ -181,16 +181,38 @@ class UserInteraction
 
     private function showTimetable($userInfo)
     {
+        $time = time();
+
+        $imgUrl = "https://bot-srv.mgsu.ru/api/get/schedule?partyId={$userInfo['groupId']}&timestamp={$time}&image=true";
+
+        $rawTimetable = file_get_contents("https://bot-srv.mgsu.ru/api/get/schedule?partyId={$userInfo['groupId']}&timestamp={$time}");
+
+
+        $rawTimetable = json_decode($rawTimetable, true);
+        $lessonCount = count($rawTimetable);
+
+        $textTimetable = $rawTimetable['data']['Lessons'][0]['date'] . '\n\n   Время начало занятий - ' . $rawTimetable['data']['Lessons'][0]['startTime'] . '\n\n\n';
+
+        for ($i = 0; $i < $lessonCount; $i++)
+        {
+
+            $textTimetable .= $rawTimetable['data']['Lessons'][$i]['podgrs'][0]['aud'] . ' : ' . $rawTimetable['data']['Lessons'][$i]['podgrs'][0]['textLesson'] . '\n\n';
+
+
+        }
+
+
 
         echo '{
   "response": {
-    "text": "Здравствуйте! Это мы, хороводоведы.",
+    "text": "'.$textTimetable.'",
     "tts": "Здравствуйте! Это мы, хоров+одо в+еды.",
     "buttons": [
         {
-            "title": "Надпись на кнопке",
-               "payload": "{\"' . 'TableTime' . '\" : ' . '1' . '}",
-            "hide": true
+            "title": "Фото с расписанием",
+            "url" : "'.$imgUrl.'",
+           
+            "hide": false
         }
     ],
     "end_session": false
