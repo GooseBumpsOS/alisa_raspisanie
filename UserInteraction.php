@@ -45,14 +45,23 @@ class UserInteraction
 
             $command = $this->allData['request']['command'];
 
-            switch ($command) {
+            switch (strtolower($command)) {
 
-                case 'Расписание на сегодня':
+                case 'расписание на сегодня':
+                case 'расписание':
                     $this->userReqData = 'TableTime';
                     break;
 
-                case 'Удали мой аккаунт':
+                case 'удали мой аккаунт':
+                case 'удалить':
                     $this->userReqData = 'delete';
+                    break;
+
+                case 'помощь':
+                case 'информация':
+                case 'что ты умеешь?':
+                case 'что ты умеешь':
+                    $this->userReqData = 'info';
                     break;
             }
 
@@ -89,11 +98,15 @@ class UserInteraction
                     break;
 
                 case 'hello':
-                    $this->showMessage(['Привет, рады видеть тебя в боте']);
+                    $this->showMessage(['Привет, рады тебя видеть, напише помощь для того чтобы увидеть мои возможности']);
                     break;
 
                 case 'delete':
                     $this->deleteUser();
+                    break;
+
+                case 'info':
+                    $this->showInfo();
                     break;
 
                 default:
@@ -315,6 +328,25 @@ class UserInteraction
 }';
 
         die();
+
+    }
+
+    private function showInfo()
+    {
+
+        echo '{
+  "response": {
+    "text": "Помощь - для показа подсказок. Удалить - удалит ваш аккаунт. Расписание - показать расписание",
+    "tts": "Удалено",
+    "end_session": false
+  },
+  "session": {
+    "session_id": "' . $this->allData['session']['session_id'] . '",
+    "message_id": ' . $this->allData['session']['message_id'] . ',
+    "user_id": "' . $this->userId . '"
+  },
+  "version": "1.0"
+}';
 
     }
 
