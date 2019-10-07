@@ -20,7 +20,7 @@ header('Content-Type: application/json');
 $response = '';
 
 /**
- * Впишите сюда своё активационное имя
+ * Впиши сюда своё активационное имя
  */
 $mySkillName = 'gooseBotAlisa';
 
@@ -46,20 +46,12 @@ try{
              */
             $result = json_encode([]);
         } else {
-            /**
-             * Получаем что конкретно спросил пользователь
-             */
+
 
 
             $userInter = new UserInteraction($data);
             $userInter->start();
             $userInter = null;
-
-            /**
-             * Приводим на всякий случай запрос пользователя к нижнему регистру
-             */
-
-           // $response = makeButton(file_get_contents('https://bot-srv.mgsu.ru/api/get/grade'));
 
         }
     } else {
