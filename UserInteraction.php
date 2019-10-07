@@ -26,7 +26,7 @@ class UserInteraction
     public function start()
     {
 
-        if (isset($this->allData['request']['payload'])) //добавить свой обработчик payload, тк этот сугубо для регистрации
+        if (isset($this->allData['request']['payload'])) //обработка команд для кнопок
         {
 
             $payload = json_decode($this->allData['request']['payload'], true);
@@ -40,6 +40,20 @@ class UserInteraction
                     $this->db->update(array_keys($payload)[0], array_values($payload)[0], $this->userId);
                     break;
             }
+
+        } elseif (isset($this->allData['request']['command'])){
+
+            $command = $this->allData['request']['command'];
+
+            switch ($command)
+            {
+
+                case 'Расписание на сегодня':
+                    $this->userReqData = 'TableTime';
+                    break;
+            }
+
+
 
         }
 
