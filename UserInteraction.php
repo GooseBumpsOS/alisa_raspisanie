@@ -22,13 +22,23 @@ class UserInteraction
         $this->db = new DbLayer('root', '9e4ed01e02', '127.0.0.1', 'alisa');
     }
 
-    public function start(){
+    public function start()
+    {
 
         if (isset($this->allData['request']['payload'])) //добавить свой обработчик payload, тк этот сугубо для регистрации
         {
 
             $payload = json_decode($this->allData['request']['payload'], true);
-            $this->db->update(array_keys( $payload )[0], array_values($payload)[0], $this->userId);
+
+            switch (array_keys($payload)[0]) {
+                case 'TableTime':
+                    $this->userReqData = 'TableTime';
+                    break;
+
+                default:
+                    $this->db->update(array_keys($payload)[0], array_values($payload)[0], $this->userId);
+                    break;
+            }
 
         }
 
@@ -39,22 +49,30 @@ class UserInteraction
 
     private function isUserExist()
     {
-        try{
-            $userInfo =  $this->db->select($this->userId);
+        try {
+            $userInfo = $this->db->select($this->userId);
             if (!$userInfo)
                 throw new \Exception('Пустой селект');
-        } catch (\Exception $e){
+        } catch (\Exception $e) {
 
             $this->db->insertNewUserId($this->userId);
-            $userInfo =  $this->db->select($this->userId);
+            $userInfo = $this->db->select($this->userId);
 
         }
 
         $this->userDbInfo = $userInfo;
 
-        if (count(array_filter($userInfo)) == count($userInfo)) { //если все не null
+        if (count(array_filter($userInfo)) == count($userInfo)) { //если все не null => есть незаполненные поля реги
 
-            echo 'showButton';//showButton(); //здесь функция если пользователь зареган
+            switch ($this->userReqData) {
+                case 'TableTime':
+                    $this->showTimetable($this->userDbInfo);
+                    break;
+
+                default:
+                    $this->showErrorMessage();
+                    break;
+            }
 
         } else {
 
@@ -69,6 +87,7 @@ class UserInteraction
 
 
         switch (null) {
+
 
             case $userInfo['edForm']:
                 $this->askQuestion('edForm');
@@ -90,10 +109,40 @@ class UserInteraction
         }
 
 
+    }
+
+    private function showErrorMessage()
+    {
+
+        $resRes = ['Извините, не могу вас понять.', 'Я вас не пойму, вы что с ЭУИС?', 'Это сообщение с болота? Давай еще раз'];
+
+        echo '{
+  "response": {
+    "text": "'. $resRes[array_rand($resRes)] .'",
+    "tts": "'. $resRes[array_rand($resRes)] .'",
+    "buttons": [
+        {
+            "title": "Расписание на сегодня",
+               "payload": "{\"TableTime\" : 1}",
+            "hide": true
+        }
+    ],
+    "end_session": false
+  },
+  "session": {
+        "session_id": "' . $this->allData['session']['session_id'] . '",
+    "message_id": ' . $this->allData['session']['message_id'] . ',
+    "user_id": "' . $this->userId . '"
+  },
+  "version": "1.0"
+}';
+
+        die();
+
 
     }
 
-    private function makeButton($data, $text = ' ', $columnName)
+    private function makeRegButton($data, $text = ' ', $columnName)
     {
         $buttons = '';
 
@@ -102,7 +151,7 @@ class UserInteraction
 
             $buttons = $buttons . '        {
             "title": "' . $data['data'][$i]['name'] . '",
-            "payload": "{\"' .  $columnName . '\" : ' . $data['data'][$i]['id'] . '}",
+            "payload": "{\"' . $columnName . '\" : ' . $data['data'][$i]['id'] . '}",
             "hide": true
         },';
 
@@ -120,13 +169,39 @@ class UserInteraction
     "end_session": false
   },
   "session": {
-    "session_id": "'. $this->allData['session']['session_id'] .'",
-    "message_id": '.  $this->allData['session']['message_id'] .',
-    "user_id": "'. $this->userId .'"
+    "session_id": "' . $this->allData['session']['session_id'] . '",
+    "message_id": ' . $this->allData['session']['message_id'] . ',
+    "user_id": "' . $this->userId . '"
   },
   "version": "1.0"
 }';
 
+
+    }
+
+    private function showTimetable($userInfo)
+    {
+
+        echo '{
+  "response": {
+    "text": "Здравствуйте! Это мы, хороводоведы.",
+    "tts": "Здравствуйте! Это мы, хоров+одо в+еды.",
+    "buttons": [
+        {
+            "title": "Надпись на кнопке",
+               "payload": "{\"' . 'TableTime' . '\" : ' . '1' . '}",
+            "hide": true
+        }
+    ],
+    "end_session": false
+  },
+  "session": {
+    "session_id": "' . $this->allData['session']['session_id'] . '",
+    "message_id": ' . $this->allData['session']['message_id'] . ',
+    "user_id": "' . $this->userId . '"
+  },
+  "version": "1.0"
+}';
 
     }
 
@@ -138,35 +213,34 @@ class UserInteraction
             case 'edForm':
 
                 $apiData = json_decode(file_get_contents('https://bot-srv.mgsu.ru/api/get/grade'), true);
-                $this->makeButton($apiData,  'Выберите форму обучения: ', 'edForm');
+                $this->makeRegButton($apiData, 'Выберите форму обучения: ', 'edForm');
 
 
                 break;
             case 'inst':
 
                 $apiData = json_decode(file_get_contents('https://bot-srv.mgsu.ru/api/get/institute?gradeId=' . $this->userDbInfo['edForm']), true);
-                $this->makeButton($apiData,  'Выберите институт: ', 'inst');
+                $this->makeRegButton($apiData, 'Выберите институт: ', 'inst');
 
                 break;
             case 'fac':
 
                 $apiData = json_decode(file_get_contents('https://bot-srv.mgsu.ru/api/get/faculty?instituteId=' . $this->userDbInfo['inst']), true);
-                $this->makeButton($apiData,  'Выберите факультут: ', 'fac');
+                $this->makeRegButton($apiData, 'Выберите факультут: ', 'fac');
 
                 break;
             case 'curs':
 
                 $apiData = json_decode(file_get_contents('http://bot-srv.mgsu.ru/api/get/year?facultyId=' . $this->userDbInfo['fac']), true);
-                $this->makeButton($apiData,  'Выберите курс: ','curs');
+                $this->makeRegButton($apiData, 'Выберите курс: ', 'curs');
 
                 break;
             case 'groupId':
 
                 $apiData = json_decode(file_get_contents('http://bot-srv.mgsu.ru/api/get/party?yearId=' . $this->userDbInfo['curs']), true);
-                $this->makeButton($apiData,  'Выберите вашу группу: ', 'groupId');
+                $this->makeRegButton($apiData, 'Выберите вашу группу: ', 'groupId');
 
                 break;
-
 
 
         }
