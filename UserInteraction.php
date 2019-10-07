@@ -284,7 +284,7 @@ class UserInteraction
             case 'edForm':
 
                 $apiData = json_decode(file_get_contents('https://bot-srv.mgsu.ru/api/get/grade'), true);
-                $this->makeRegButton($apiData, 'Выберите форму обучения: ', 'edForm');
+                $this->makeRegButton($apiData, 'Привет! \n Для того чтобы начать пользоваться нашим новым ботом, тебе нужно указать данные о себе. Выберите форму обучения: ', 'edForm');
 
 
                 break;
@@ -326,13 +326,6 @@ class UserInteraction
   "response": {
     "text": "Удалено.",
     "tts": "Удалено",
-            "buttons": [
-         {
-            "title": "Расписание на сегодня",
-               "payload": "{\"TableTime\" : 1}",
-            "hide": true
-        }
-    ],
     "end_session": false
   },
   "session": {
