@@ -20,6 +20,7 @@ class UserInteraction
         $this->allData = $data;
         $this->userId = $data['session']['user_id'];
         $this->db = new DbLayer('root', '9e4ed01e02', '127.0.0.1', 'alisa');
+        $this->userReqData = null;
     }
 
     public function start()
@@ -42,6 +43,8 @@ class UserInteraction
 
         }
 
+        if ($this->allData['session']['message_id'] == 0)
+            $this->userReqData = 'hello';
 
         $this->isUserExist();
 
@@ -69,8 +72,12 @@ class UserInteraction
                     $this->showTimetable($this->userDbInfo);
                     break;
 
+                case 'hello':
+                    $this->showMessage(['Привет, рады видеть тебя в боте']);
+                    break;
+
                 default:
-                    $this->showErrorMessage();
+                    $this->showMessage();
                     break;
             }
 
@@ -111,15 +118,12 @@ class UserInteraction
 
     }
 
-    private function showErrorMessage()
+    private function showMessage($response = ['Извините, не могу вас понять. Нажмите нужную вам кнопку', 'Я вас не пойму, вы что с ЭУИС? Нажмите нужную вам кнопку', 'Это сообщение с болота? Давай еще раз, нажмите нужную вам кнопку'])
     {
-
-        $resRes = ['Извините, не могу вас понять.', 'Я вас не пойму, вы что с ЭУИС?', 'Это сообщение с болота? Давай еще раз'];
-
         echo '{
   "response": {
-    "text": "'. $resRes[array_rand($resRes)] .'",
-    "tts": "'. $resRes[array_rand($resRes)] .'",
+    "text": "' . $response[array_rand($response)] . '",
+    "tts": "' . $response[array_rand($response)] . '",
     "buttons": [
         {
             "title": "Расписание на сегодня",
@@ -193,8 +197,7 @@ class UserInteraction
 
         $textTimetable = $rawTimetable['data']['Lessons'][0]['date'] . '\n\n   Время начало занятий - ' . $rawTimetable['data']['Lessons'][0]['startTime'] . '\n\n\n';
 
-        for ($i = 0; $i < $lessonCount; $i++)
-        {
+        for ($i = 0; $i < $lessonCount; $i++) {
 
             $textTimetable .= $rawTimetable['data']['Lessons'][$i]['podgrs'][0]['aud'] . ' : ' . $rawTimetable['data']['Lessons'][$i]['podgrs'][0]['textLesson'] . '\n\n';
 
@@ -202,17 +205,21 @@ class UserInteraction
         }
 
 
-
         echo '{
   "response": {
-    "text": "'.$textTimetable.'",
+    "text": "' . $textTimetable . '",
     "tts": "Здравствуйте! Это мы, хоров+одо в+еды.",
     "buttons": [
         {
             "title": "Фото с расписанием",
-            "url" : "'.$imgUrl.'",
+            "url" : "' . $imgUrl . '",
            
             "hide": false
+        }, 
+         {
+            "title": "Расписание на сегодня",
+               "payload": "{\"TableTime\" : 1}",
+            "hide": true
         }
     ],
     "end_session": false
