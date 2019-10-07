@@ -21,9 +21,10 @@ class UserInteraction
         $this->userId = $data['session']['user_id'];
         $this->db = new DbLayer('root', '9e4ed01e02', '127.0.0.1', 'alisa');
         $this->userReqData = null;
+        $this->getUserData();
     }
 
-    public function start()
+    private function getUserData()
     {
 
         if (isset($this->allData['request']['payload'])) //обработка команд для кнопок
@@ -71,11 +72,11 @@ class UserInteraction
         if ($this->allData['session']['message_id'] == 0)
             $this->userReqData = 'hello';
 
-        $this->isUserExist();
+        $this->userInter();
 
     }
 
-    private function isUserExist()
+    private function userInter()
     {
         try {
             $userInfo = $this->db->select($this->userId);
@@ -151,7 +152,7 @@ class UserInteraction
 
     }
 
-    private function showMessage($response = ['Извините, не могу вас понять. Нажмите нужную вам кнопку', 'Я вас не пойму, вы что с ЭУИС? Нажмите нужную вам кнопку', 'Это сообщение с болота? Давай еще раз, нажмите нужную вам кнопку'])
+    private function showMessage($response = ['Извините, не могу вас понять. Напишите помощь', 'Я вас не пойму, вы что с ЭУИС? Напишите помощь', 'Это сообщение с болота? Давай еще раз, напишите помощь'])
     {
         echo '{
   "response": {

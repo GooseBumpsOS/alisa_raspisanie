@@ -50,7 +50,6 @@ try{
 
 
             $userInter = new UserInteraction($data);
-            $userInter->start();
             $userInter = null;
 
         }
