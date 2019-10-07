@@ -45,7 +45,7 @@ class UserInteraction
 
             $command = $this->allData['request']['command'];
 
-            switch (strtolower($command)) {
+            switch (mb_strtolower($command)) {
 
                 case 'расписание на сегодня':
                 case 'расписание':
@@ -317,6 +317,13 @@ class UserInteraction
   "response": {
     "text": "Удалено.",
     "tts": "Удалено",
+            "buttons": [
+         {
+            "title": "Расписание на сегодня",
+               "payload": "{\"TableTime\" : 1}",
+            "hide": true
+        }
+    ],
     "end_session": false
   },
   "session": {
@@ -338,6 +345,13 @@ class UserInteraction
   "response": {
     "text": "Помощь - для показа подсказок. Удалить - удалит ваш аккаунт. Расписание - показать расписание",
     "tts": "Удалено",
+        "buttons": [
+         {
+            "title": "Расписание на сегодня",
+               "payload": "{\"TableTime\" : 1}",
+            "hide": true
+        }
+    ],
     "end_session": false
   },
   "session": {
