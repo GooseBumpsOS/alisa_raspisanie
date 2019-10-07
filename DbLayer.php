@@ -61,4 +61,13 @@ class DbLayer
         $dbh = null;
 
     }
+
+    public function deleteUserById($userId, $table='user')
+    {
+        $dbh = $this->connect();
+        $sql = "DELETE FROM {$table} where userId = '{$userId}';";
+        $stmt = $dbh->query($sql);
+        $dbh = null;
+
+    }
 }

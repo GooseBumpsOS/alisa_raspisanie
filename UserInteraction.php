@@ -41,18 +41,20 @@ class UserInteraction
                     break;
             }
 
-        } elseif (isset($this->allData['request']['command'])){
+        } elseif (isset($this->allData['request']['command'])) {
 
             $command = $this->allData['request']['command'];
 
-            switch ($command)
-            {
+            switch ($command) {
 
                 case 'Расписание на сегодня':
                     $this->userReqData = 'TableTime';
                     break;
-            }
 
+                case 'Удали мой аккаунт':
+                    $this->userReqData = 'delete';
+                    break;
+            }
 
 
         }
@@ -88,6 +90,10 @@ class UserInteraction
 
                 case 'hello':
                     $this->showMessage(['Привет, рады видеть тебя в боте']);
+                    break;
+
+                case 'delete':
+                    $this->deleteUser();
                     break;
 
                 default:
@@ -287,6 +293,28 @@ class UserInteraction
 
 
         }
+
+    }
+
+    private function deleteUser()
+    {
+        $this->db->deleteUserById($this->userId);
+
+        echo '{
+  "response": {
+    "text": "Удалено.",
+    "tts": "Удалено",
+    "end_session": false
+  },
+  "session": {
+    "session_id": "' . $this->allData['session']['session_id'] . '",
+    "message_id": ' . $this->allData['session']['message_id'] . ',
+    "user_id": "' . $this->userId . '"
+  },
+  "version": "1.0"
+}';
+
+        die();
 
     }
 
