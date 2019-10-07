@@ -64,6 +64,10 @@ class UserInteraction
                 case 'что ты умеешь':
                     $this->userReqData = 'info';
                     break;
+
+                case 'фото с расписанием':
+                    $this->userReqData = 'showPhotoUserClick';
+                    break;
             }
 
 
@@ -108,6 +112,10 @@ class UserInteraction
 
                 case 'info':
                     $this->showInfo();
+                    break;
+
+                case 'showPhotoUserClick':
+                    $this->showMessage([' ']);
                     break;
 
                 default:
