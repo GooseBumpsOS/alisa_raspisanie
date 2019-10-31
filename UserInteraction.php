@@ -235,7 +235,7 @@ class UserInteraction
 
 
         $rawTimetable = json_decode($rawTimetable, true);
-        $lessonCount = count($rawTimetable);
+        $lessonCount = count($rawTimetable["data"]["Lessons"]);
 
         $textTimetable = $rawTimetable['data']['Lessons'][0]['date'] . '\n\n   Время начало занятий - ' . $rawTimetable['data']['Lessons'][0]['startTime'] . '\n\n\n';
 
