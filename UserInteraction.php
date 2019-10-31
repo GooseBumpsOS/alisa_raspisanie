@@ -19,7 +19,7 @@ class UserInteraction
     {
         $this->allData = $data;
         $this->userId = $data['session']['user_id'];
-        $this->db = new DbLayer('root', '9e4ed01e02', '127.0.0.1', 'alisa');
+        $this->db = new DbLayer('alisa', 'Q7pvA7KRZaZ9vZFt', '127.0.0.1', 'alisa');
         $this->userReqData = null;
         $this->getUserData();
     }
@@ -250,7 +250,7 @@ class UserInteraction
         echo '{
   "response": {
     "text": "' . $textTimetable . '",
-    "tts": "Здравствуйте! Это мы, хоров+одо в+еды.",
+    "tts": "' . $textTimetable . '",
     "buttons": [
         {
             "title": "Фото с расписанием",
@@ -297,7 +297,7 @@ class UserInteraction
             case 'fac':
 
                 $apiData = json_decode(file_get_contents('https://bot-srv.mgsu.ru/api/get/faculty?instituteId=' . $this->userDbInfo['inst']), true);
-                $this->makeRegButton($apiData, 'Выберите факультут: ', 'fac');
+                $this->makeRegButton($apiData, 'Выберите факультет: ', 'fac');
 
                 break;
             case 'curs':
