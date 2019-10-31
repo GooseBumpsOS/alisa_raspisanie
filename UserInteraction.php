@@ -395,7 +395,13 @@ class UserInteraction
             "title": "Расписание на сегодня",
                "payload": "{\"TableTime\" : 1}",
             "hide": true
-        }
+        }, 
+        {
+            "title": "Расписание на сегодня",
+               "payload": "{\"TableTimeNext\" : 1}",
+            "hide": true
+        }, 
+        
     ],
     "end_session": false
   },
