@@ -327,7 +327,7 @@ class UserInteraction
             case 'edForm':
 
                 $apiData = json_decode(file_get_contents('https://bot-srv.mgsu.ru/api/get/grade'), true);
-                $this->makeRegButton($apiData, 'Привет!\n \n Для того чтобы начать пользоваться нашим новым ботом, тебе нужно указать данные о себе. Выберите форму обучения или назови уникальный номер группы: ', 'edForm');
+                $this->makeRegButton($apiData, 'Привет, для того чтобы узнать своё расписание МГСУ используй указанные ниже кнопки или произнеси уникальный номер группы, который ты можешь получить в МГСУ боте в социальной сети Вконтакте: ', 'edForm');
 
 
                 break;
