@@ -13,6 +13,7 @@ class UserInteraction
     private $userDbInfo;
     private $userReqData;
     private $db;
+    private $commnad;
 
     /*JSON Data input*/
     function __construct($data)
@@ -37,7 +38,21 @@ class UserInteraction
                     $this->userReqData = 'TableTime';
                     break;
 
+                case 'TableTimeNext':
+                    $this->userReqData = 'TableTimeNext';
+                    break;
+
                 default:
+
+                    if (array_keys($payload)[0] == 'groupId')
+                    {
+                        $this->congratulation();
+                        $this->db->update(array_keys($payload)[0], array_values($payload)[0], $this->userId);
+                        die();
+
+                    }
+
+
                     $this->db->update(array_keys($payload)[0], array_values($payload)[0], $this->userId);
                     break;
             }
@@ -45,12 +60,17 @@ class UserInteraction
         } elseif (isset($this->allData['request']['command'])) {
 
             $command = $this->allData['request']['command'];
+            $this->commnad = $command;
 
             switch (mb_strtolower($command)) {
 
                 case 'расписание на сегодня':
                 case 'расписание':
                     $this->userReqData = 'TableTime';
+                    break;
+
+                case 'расписание на завтра':
+                    $this->userReqData = 'TableTimeNext';
                     break;
 
                 case 'удали мой аккаунт':
@@ -95,15 +115,20 @@ class UserInteraction
 
         $this->userDbInfo = $userInfo;
 
-        if (count(array_filter($userInfo)) == count($userInfo)) { //если все не null => есть незаполненные поля реги
+        if (count(array_filter($userInfo)) == count($userInfo) || $userInfo['groupId'] != null) { //если все не null => есть незаполненные поля реги
 
             switch ($this->userReqData) {
                 case 'TableTime':
-                    $this->showTimetable($this->userDbInfo);
+                    $this->showTimetable($this->userDbInfo, time());
                     break;
 
+                case 'TableTimeNext':
+                      $this->showTimetable($this->userDbInfo, time() + 86400);
+                      break;
+
+
                 case 'hello':
-                    $this->showMessage(['Привет, рады тебя видеть, напише помощь для того чтобы увидеть мои возможности']);
+                    $this->showMessage(['Привет, рады тебя видеть, напиши помощь для того чтобы увидеть мои возможности']);
                     break;
 
                 case 'delete':
@@ -134,6 +159,12 @@ class UserInteraction
     private function makeRegister($userInfo)
     { //здесь свитч для того чтобы определить на каком ты этапе
 
+        if (!empty($this->commnad) && preg_match('/[0-9]/', $this->commnad))
+        {
+            $this->db->update("groupId", $this->commnad, $this->userId);
+            $this->congratulation();
+            die();
+        }
 
         switch (null) {
 
@@ -171,7 +202,13 @@ class UserInteraction
             "title": "Расписание на сегодня",
                "payload": "{\"TableTime\" : 1}",
             "hide": true
+        },
+                {
+            "title": "Расписание на завтра",
+               "payload": "{\"TableTimeNext\" : 1}",
+            "hide": true
         }
+        
     ],
     "end_session": false
   },
@@ -187,6 +224,7 @@ class UserInteraction
 
 
     }
+
 
     private function makeRegButton($data, $text = ' ', $columnName)
     {
@@ -225,10 +263,8 @@ class UserInteraction
 
     }
 
-    private function showTimetable($userInfo)
+    private function showTimetable($userInfo, $time)
     {
-        $time = time();
-
         $imgUrl = "https://bot-srv.mgsu.ru/api/get/schedule?partyId={$userInfo['groupId']}&timestamp={$time}&image=true";
 
         $rawTimetable = file_get_contents("https://bot-srv.mgsu.ru/api/get/schedule?partyId={$userInfo['groupId']}&timestamp={$time}");
@@ -262,6 +298,11 @@ class UserInteraction
             "title": "Расписание на сегодня",
                "payload": "{\"TableTime\" : 1}",
             "hide": true
+        }, 
+                 {
+            "title": "Расписание на завтра",
+               "payload": "{\"TableTimeNext\" : 1}",
+            "hide": true
         }
     ],
     "end_session": false
@@ -284,7 +325,7 @@ class UserInteraction
             case 'edForm':
 
                 $apiData = json_decode(file_get_contents('https://bot-srv.mgsu.ru/api/get/grade'), true);
-                $this->makeRegButton($apiData, 'Привет! \n Для того чтобы начать пользоваться нашим новым ботом, тебе нужно указать данные о себе. Выберите форму обучения: ', 'edForm');
+                $this->makeRegButton($apiData, 'Привет!\n \n Для того чтобы начать пользоваться нашим новым ботом, тебе нужно указать данные о себе. Выберите форму обучения или назови уникальный номер группы: ', 'edForm');
 
 
                 break;
@@ -340,13 +381,39 @@ class UserInteraction
 
     }
 
+    private function congratulation()
+    {
+
+        echo '{
+  "response": {
+    "text": "Поздравляю, вы зарегестрировались. Напиши помощь для подсказки",
+    "tts": "Поздравляю, вы зарегестрировались. Напиши помощь для подсказки",
+        "buttons": [
+         {
+            "title": "Расписание на сегодня",
+               "payload": "{\"TableTime\" : 1}",
+            "hide": true
+        }
+    ],
+    "end_session": false
+  },
+  "session": {
+    "session_id": "' . $this->allData['session']['session_id'] . '",
+    "message_id": ' . $this->allData['session']['message_id'] . ',
+    "user_id": "' . $this->userId . '"
+  },
+  "version": "1.0"
+}';
+
+    }
+
     private function showInfo()
     {
 
         echo '{
   "response": {
     "text": "Помощь - для показа подсказок. Удалить - удалит ваш аккаунт. Расписание - показать расписание",
-    "tts": "Удалено",
+    "tts": "Помощь - для показа подсказок. Удалить - удалит ваш аккаунт. Расписание - показать расписание",
         "buttons": [
          {
             "title": "Расписание на сегодня",
