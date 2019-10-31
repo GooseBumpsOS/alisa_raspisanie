@@ -66,10 +66,12 @@ class UserInteraction
 
                 case 'расписание на сегодня':
                 case 'расписание':
+                case 'на сегодня ':
                     $this->userReqData = 'TableTime';
                     break;
 
                 case 'расписание на завтра':
+                case 'на завтра':
                     $this->userReqData = 'TableTimeNext';
                     break;
 
